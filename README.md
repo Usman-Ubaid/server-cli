@@ -1,4 +1,4 @@
-# Server-CLI
+# server-CLI
 
 Node.js server-side project to create CLI commands that can read and write from database. The commands can only be implemented in CLI.
 
