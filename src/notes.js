@@ -1,22 +1,23 @@
-import { saveDB, getDB, insertDB } from "./db";
+import { insertDB, saveDB, getDB } from "./db.js";
 
 export const createNewNote = async (note, tags) => {
-  const data = {
+  const newNote = {
     tags,
-    content: note,
     id: Date.now(),
+    content: note,
   };
-  await insertDB(data);
-  return data;
+
+  await insertDB(newNote);
+  return newNote;
 };
 
 export const getAllNotes = async () => {
-  const db = await getDB();
-  return db.notes;
+  const { notes } = await getDB();
+  return notes;
 };
 
 export const findNotes = async (filter) => {
-  const notes = await getAllNotes();
+  const { notes } = await getDB();
   return notes.filter((note) =>
     note.content.toLowerCase().includes(filter.toLowerCase())
   );
@@ -30,9 +31,9 @@ export const removeNote = async (id) => {
     const newNotes = notes.filter((note) => note.id !== id);
     await saveDB({ notes: newNotes });
     return id;
+  } else {
+    console.log("No match found.");
   }
 };
 
-export const removeAllNotes = async () => {
-  await saveDB({ notes: [] });
-};
+export const removeAllNotes = () => saveDB({ notes: [] });

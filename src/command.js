@@ -1,18 +1,36 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import {
+  createNewNote,
+  getAllNotes,
+  removeAllNotes,
+  removeNote,
+  findNotes,
+} from "./notes.js";
+
+const listNotes = (notes) => {
+  notes.forEach(({ id, content, tags }) => {
+    console.log(`id: ${id}`);
+    console.log(`content: ${content}`);
+    console.log(`tags: ${tags}`);
+    console.log("\n");
+  });
+};
 
 yargs(hideBin(process.argv))
   .command(
-    "new <url>",
-    "creates a new note",
+    "new <note>",
+    "create a new note",
     (yargs) => {
       return yargs.positional("note", {
         type: "string",
-        description: "The content of the note",
+        description: "The content of the note to create",
       });
     },
-    (argv) => {
-      console.log("New note added: ");
+    async (argv) => {
+      const tags = argv.tags ? argv.tags.split(",") : [];
+      const note = await createNewNote(argv.note, tags);
+      console.log("New note added", note);
     }
   )
   .option("tags", {
@@ -25,7 +43,8 @@ yargs(hideBin(process.argv))
     "get all notes",
     () => {},
     async () => {
-      console.log("All notes fetched");
+      const allNotes = await getAllNotes();
+      listNotes(allNotes);
     }
   )
   .command(
@@ -38,7 +57,10 @@ yargs(hideBin(process.argv))
         type: "string",
       });
     },
-    async (argv) => {}
+    async (argv) => {
+      const filterNotes = await findNotes(argv.filter);
+      listNotes(filterNotes);
+    }
   )
   .command(
     "remove <id>",
@@ -49,25 +71,19 @@ yargs(hideBin(process.argv))
         description: "The id of the note you want to remove",
       });
     },
-    async (argv) => {}
-  )
-  .command(
-    "web [port]",
-    "launch website to see notes",
-    (yargs) => {
-      return yargs.positional("port", {
-        describe: "port to bind on",
-        default: 5000,
-        type: "number",
-      });
-    },
-    async (argv) => {}
+    async (argv) => {
+      const idToRemove = await removeNote(argv.id);
+      console.log(idToRemove);
+    }
   )
   .command(
     "clean",
     "remove all notes",
     () => {},
-    async (argv) => {}
+    async (argv) => {
+      await removeAllNotes();
+      console.log("db reseted");
+    }
   )
   .demandCommand(1)
   .parse();
