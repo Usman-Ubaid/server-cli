@@ -6,9 +6,13 @@ import {
   removeAllNotes,
   removeNote,
   findNotes,
-} from "./notes.js";
+} from "./notes";
 
-const listNotes = (notes) => {
+type NotesTypes = {
+  notes: [{ id: number; content: string; tags: string[] }];
+};
+
+const listNotes = (notes: NotesTypes) => {
   notes.forEach(({ id, content, tags }) => {
     console.log(`id: ${id}`);
     console.log(`content: ${content}`);

@@ -16,14 +16,14 @@ export const getAllNotes = async () => {
   return notes;
 };
 
-export const findNotes = async (filter) => {
+export const findNotes = async (filter: string) => {
   const { notes } = await getDB();
   return notes.filter((note) =>
     note.content.toLowerCase().includes(filter.toLowerCase())
   );
 };
 
-export const removeNote = async (id) => {
+export const removeNote = async (id: number) => {
   const notes = await getAllNotes();
   const match = notes.find((note) => note.id === id);
 
