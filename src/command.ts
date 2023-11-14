@@ -1,4 +1,4 @@
-import yargs from "yargs";
+import yargs, { Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
 import {
   createNewNote,
@@ -7,12 +7,9 @@ import {
   removeNote,
   findNotes,
 } from "./notes";
+import { NoteType } from "./db";
 
-type NotesTypes = {
-  notes: [{ id: number; content: string; tags: string[] }];
-};
-
-const listNotes = (notes: NotesTypes) => {
+const listNotes = (notes: NoteType[]) => {
   notes.forEach(({ id, content, tags }) => {
     console.log(`id: ${id}`);
     console.log(`content: ${content}`);
@@ -26,15 +23,25 @@ yargs(hideBin(process.argv))
     "new <note>",
     "create a new note",
     (yargs) => {
-      return yargs.positional("note", {
-        type: "string",
-        description: "The content of the note to create",
-      });
+      return yargs
+        .positional("note", {
+          type: "string",
+          description: "The content of the note to create",
+        })
+        .positional("tags", {
+          type: "string",
+          description: "tags to add note to the note",
+        });
     },
     async (argv) => {
       const tags = argv.tags ? argv.tags.split(",") : [];
-      const note = await createNewNote(argv.note, tags);
-      console.log("New note added", note);
+      if (argv.note !== undefined) {
+        const note = await createNewNote(argv.note, tags);
+        console.log("New note added", note);
+      } else {
+        console.error("Invalid note provided.");
+        return;
+      }
     }
   )
   .option("tags", {
@@ -62,8 +69,13 @@ yargs(hideBin(process.argv))
       });
     },
     async (argv) => {
-      const filterNotes = await findNotes(argv.filter);
-      listNotes(filterNotes);
+      if (argv.filter !== undefined) {
+        const filterNotes = await findNotes(argv.filter);
+        listNotes(filterNotes);
+      } else {
+        console.log("Invalid filter string provided");
+        return;
+      }
     }
   )
   .command(
@@ -76,8 +88,12 @@ yargs(hideBin(process.argv))
       });
     },
     async (argv) => {
-      const idToRemove = await removeNote(argv.id);
-      console.log(idToRemove);
+      if (argv.id !== undefined) {
+        const idToRemove = await removeNote(argv.id);
+        console.log(idToRemove);
+      } else {
+        console.log("Provide number input");
+      }
     }
   )
   .command(

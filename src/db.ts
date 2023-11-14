@@ -1,5 +1,15 @@
 import fs from "fs/promises";
 
+export type NoteType = {
+  tags: string[];
+  id: number;
+  content: string;
+};
+
+type DBType = {
+  notes: NoteType[];
+};
+
 const DB_PATH = new URL("../db.json", import.meta.url);
 
 export const getDB = async () => {
@@ -7,12 +17,12 @@ export const getDB = async () => {
   return JSON.parse(db);
 };
 
-export const saveDB = async (db) => {
+export const saveDB = async (db: DBType) => {
   await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2));
   return db;
 };
 
-export const insertDB = async (note) => {
+export const insertDB = async (note: NoteType) => {
   const db = await getDB();
   db.notes.push(note);
   await saveDB(db);

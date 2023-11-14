@@ -1,6 +1,12 @@
 import { insertDB, saveDB, getDB } from "./db.js";
 
-export const createNewNote = async (note, tags) => {
+type NoteType = {
+  tags: string[];
+  id: number;
+  content: string;
+};
+
+export const createNewNote = async (note: string, tags: string[]) => {
   const newNote = {
     tags,
     id: Date.now(),
@@ -12,12 +18,12 @@ export const createNewNote = async (note, tags) => {
 };
 
 export const getAllNotes = async () => {
-  const { notes } = await getDB();
+  const { notes }: { notes: NoteType[] } = await getDB();
   return notes;
 };
 
 export const findNotes = async (filter: string) => {
-  const { notes } = await getDB();
+  const { notes }: { notes: NoteType[] } = await getDB();
   return notes.filter((note) =>
     note.content.toLowerCase().includes(filter.toLowerCase())
   );
